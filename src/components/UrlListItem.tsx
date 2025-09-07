@@ -1,5 +1,6 @@
 // src/components/UrlListItem.tsx
 import React from "react";
+import { Link } from "react-router-dom"; // Importe Link
 
 interface MonitoredURL {
   id: string;
@@ -27,7 +28,14 @@ const UrlListItem: React.FC<UrlListItemProps> = ({ url, onEdit, onDelete }) => {
   return (
     <div className="bg-white p-4 rounded-lg shadow-md flex items-center justify-between mb-3">
       <div>
-        <h3 className="text-lg font-semibold text-gray-800">{url.name}</h3>
+        <h3 className="text-lg font-semibold text-gray-800">
+          <Link
+            to={`/urls/${url.id}`}
+            className="text-blue-600 hover:underline"
+          >
+            {url.name}
+          </Link>
+        </h3>
         <p className="text-sm text-gray-600">{url.url}</p>
         <p className="text-xs text-gray-500">Intervalo: {url.interval}s</p>
       </div>
