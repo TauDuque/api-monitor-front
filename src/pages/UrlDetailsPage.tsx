@@ -86,10 +86,12 @@ const UrlDetailsPage: React.FC = () => {
         if (!incidentsRes.ok) throw new Error("Failed to fetch incidents");
         const incidentsData: Incident[] = await incidentsRes.json();
         setIncidents(incidentsData);
-      } catch (err: any) {
-        setError(
-          err.message || "Ocorreu um erro ao carregar os detalhes da URL."
-        );
+      } catch (err: unknown) {
+        const errorMessage =
+          err instanceof Error
+            ? err.message
+            : "Ocorreu um erro ao carregar os detalhes da URL.";
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }
