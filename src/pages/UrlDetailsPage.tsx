@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import UptimeChart from "../components/UptimeChart";
 import StatusTimeline from "../components/StatusTimeline";
+import AlertConfigurationForm from "../components/AlertConfigurationForm";
+import IncidentHistory from "../components/IncidentHistory";
 
 interface MonitoredURL {
   id: string;
@@ -28,11 +30,20 @@ interface UptimeMetric {
   uptime_percentage: number;
 }
 
+interface Incident {
+  id: string;
+  type: string;
+  description: string;
+  startedAt: string;
+  resolvedAt: string | null;
+}
+
 const UrlDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [urlDetails, setUrlDetails] = useState<MonitoredURL | null>(null);
   const [history, setHistory] = useState<URLCheck[]>([]);
   const [uptimeData, setUptimeData] = useState<UptimeMetric[]>([]);
+  const [incidents, setIncidents] = useState<Incident[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -69,6 +80,12 @@ const UrlDetailsPage: React.FC = () => {
         if (!uptimeRes.ok) throw new Error("Failed to fetch uptime data");
         const uptimeJson: UptimeMetric[] = await uptimeRes.json();
         setUptimeData(uptimeJson);
+
+        // Fetch incidents
+        const incidentsRes = await fetch(`/api/checks/${id}/incidents`);
+        if (!incidentsRes.ok) throw new Error("Failed to fetch incidents");
+        const incidentsData: Incident[] = await incidentsRes.json();
+        setIncidents(incidentsData);
       } catch (err: any) {
         setError(
           err.message || "Ocorreu um erro ao carregar os detalhes da URL."
@@ -155,6 +172,15 @@ const UrlDetailsPage: React.FC = () => {
         ) : (
           <p>Nenhum histórico de verificações disponível.</p>
         )}
+      </div>
+
+      <div className="mt-8">
+        <AlertConfigurationForm monitoredUrlId={id!} />
+      </div>
+
+      <div className="mt-8">
+        <h2 className="text-2xl font-semibold mb-4">Histórico de Incidentes</h2>
+        <IncidentHistory incidents={incidents} />
       </div>
     </div>
   );
