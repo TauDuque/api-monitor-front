@@ -107,14 +107,16 @@ const DashboardPage: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-6">Dashboard de Monitoramento</h1>
-      <p className="text-gray-700 mb-8">
+      <h1 className="text-3xl font-bold mb-6 text-white">
+        Dashboard de Monitoramento
+      </h1>
+      <p className="text-gray-300 mb-8">
         Acompanhe o status em tempo real das suas URLs monitoradas.
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {urls.length === 0 && (
-          <p className="col-span-full text-gray-600">
+          <p className="col-span-full text-gray-300">
             Nenhuma URL monitorada. Adicione uma nas{" "}
             <Link to="/settings" className="text-blue-500 hover:underline">
               Configurações
@@ -136,7 +138,7 @@ const DashboardPage: React.FC = () => {
                   {url.name}
                 </Link>
               </h2>
-              <p className="text-gray-600 text-sm mb-4">{url.url}</p>
+              <p className="text-gray-300 text-sm mb-4">{url.url}</p>
             </div>
             <div className="flex items-center justify-between">
               <span
@@ -155,16 +157,16 @@ const DashboardPage: React.FC = () => {
                   : "Aguardando"}
               </span>
               <div className="text-right">
-                <p className="text-sm text-gray-700">
+                <p className="text-sm text-gray-300">
                   Status: {url.lastCheckStatus || "N/A"}
                 </p>
-                <p className="text-sm text-gray-700">
+                <p className="text-sm text-gray-300">
                   Tempo:{" "}
                   {url.lastCheckResponseTime
                     ? `${url.lastCheckResponseTime}ms`
                     : "N/A"}
                 </p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-400">
                   Último check:{" "}
                   {url.lastCheckedAt
                     ? new Date(url.lastCheckedAt).toLocaleTimeString()

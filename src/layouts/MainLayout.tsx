@@ -30,7 +30,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       <Header />
       <div className="flex flex-1">
         {/* <Sidebar /> */} {/* Descomente se for usar Sidebar */}
-        <main className="flex-1 p-6 bg-gray-100">{children}</main>
+        <main className="flex-1 p-6 bg-gray-800">{children}</main>
       </div>
       {/* Indicador de conectividade */}
       <div
