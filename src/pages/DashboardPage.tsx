@@ -68,8 +68,10 @@ const DashboardPage: React.FC = () => {
       );
 
       setUrls(urlsWithStatus);
-    } catch (err: any) {
-      setError(err.message || "Ocorreu um erro ao carregar URLs.");
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error ? err.message : "Ocorreu um erro ao carregar URLs."
+      );
     } finally {
       setLoading(false);
     }
@@ -127,7 +129,7 @@ const DashboardPage: React.FC = () => {
         {urls.map((url) => (
           <div
             key={url.id}
-            className="bg-white p-6 rounded-lg shadow-md flex flex-col justify-between"
+            className="bg-gray-700 p-6 rounded-lg shadow-md flex flex-col justify-between"
           >
             <div>
               <h2 className="text-xl font-semibold mb-2">
