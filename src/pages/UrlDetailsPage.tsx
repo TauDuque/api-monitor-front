@@ -74,18 +74,36 @@ const UrlDetailsPage: React.FC = () => {
         const thirtyDaysAgo = new Date(
           now.getTime() - 30 * 24 * 60 * 60 * 1000
         );
-        const uptimeRes = await fetch(
-          `/api/checks/${id}/uptime?period=day&startDate=${thirtyDaysAgo.toISOString()}&endDate=${now.toISOString()}`
-        );
-        if (!uptimeRes.ok) throw new Error("Failed to fetch uptime data");
-        const uptimeJson: UptimeMetric[] = await uptimeRes.json();
-        setUptimeData(uptimeJson);
+        try {
+          const uptimeRes = await fetch(
+            `/api/checks/${id}/uptime?period=day&startDate=${thirtyDaysAgo.toISOString()}&endDate=${now.toISOString()}`
+          );
+          if (uptimeRes.ok) {
+            const uptimeJson: UptimeMetric[] = await uptimeRes.json();
+            setUptimeData(uptimeJson);
+          } else {
+            console.warn("Failed to fetch uptime data, continuing without it");
+            setUptimeData([]);
+          }
+        } catch (uptimeError) {
+          console.warn("Error fetching uptime data:", uptimeError);
+          setUptimeData([]);
+        }
 
         // Fetch incidents
-        const incidentsRes = await fetch(`/api/checks/${id}/incidents`);
-        if (!incidentsRes.ok) throw new Error("Failed to fetch incidents");
-        const incidentsData: Incident[] = await incidentsRes.json();
-        setIncidents(incidentsData);
+        try {
+          const incidentsRes = await fetch(`/api/checks/${id}/incidents`);
+          if (incidentsRes.ok) {
+            const incidentsData: Incident[] = await incidentsRes.json();
+            setIncidents(incidentsData);
+          } else {
+            console.warn("Failed to fetch incidents, continuing without them");
+            setIncidents([]);
+          }
+        } catch (incidentsError) {
+          console.warn("Error fetching incidents:", incidentsError);
+          setIncidents([]);
+        }
       } catch (err: unknown) {
         const errorMessage =
           err instanceof Error
@@ -107,63 +125,77 @@ const UrlDetailsPage: React.FC = () => {
   if (!urlDetails) return <p>URL não encontrada.</p>;
 
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h1 className="text-3xl font-bold mb-4">Detalhes de {urlDetails.name}</h1>
-      <p className="text-gray-600 mb-6">URL: {urlDetails.url}</p>
+    <div className="max-w-6xl mx-auto p-6 bg-gray-700 rounded-lg shadow-md">
+      <h1 className="text-3xl font-bold mb-4 text-white">
+        Detalhes de {urlDetails.name}
+      </h1>
+      <p className="text-gray-300 mb-6">URL: {urlDetails.url}</p>
 
       <div className="mb-8">
-        <h2 className="text-2xl font-semibold mb-4">Uptime Recente</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-white">
+          Uptime Recente
+        </h2>
         {uptimeData.length > 0 ? (
           <UptimeChart
             data={uptimeData}
             title={`Uptime de ${urlDetails.name} (últimos 30 dias)`}
           />
         ) : (
-          <p>Nenhum dado de uptime disponível para o período.</p>
+          <p className="text-gray-300">
+            Nenhum dado de uptime disponível para o período.
+          </p>
         )}
       </div>
 
       <div className="mb-8">
-        <h2 className="text-2xl font-semibold mb-4">
+        <h2 className="text-2xl font-semibold mb-4 text-white">
           Timeline de Status (Últimas 24h)
         </h2>
         {history.length > 0 ? (
           <StatusTimeline checks={history} />
         ) : (
-          <p>Nenhum check recente disponível para a timeline.</p>
+          <p className="text-gray-300">
+            Nenhum check recente disponível para a timeline.
+          </p>
         )}
       </div>
 
       <div className="mb-8">
-        <h2 className="text-2xl font-semibold mb-4">
+        <h2 className="text-2xl font-semibold mb-4 text-white">
           Histórico de Verificações
         </h2>
         {history.length > 0 ? (
           <div className="overflow-x-auto">
-            <table className="min-w-full bg-white border border-gray-200">
+            <table className="min-w-full bg-gray-800 border border-gray-600">
               <thead>
                 <tr>
-                  <th className="py-2 px-4 border-b text-left">Data/Hora</th>
-                  <th className="py-2 px-4 border-b text-left">Status HTTP</th>
-                  <th className="py-2 px-4 border-b text-left">
+                  <th className="py-2 px-4 border-b border-gray-600 text-left text-white">
+                    Data/Hora
+                  </th>
+                  <th className="py-2 px-4 border-b border-gray-600 text-left text-white">
+                    Status HTTP
+                  </th>
+                  <th className="py-2 px-4 border-b border-gray-600 text-left text-white">
                     Tempo de Resposta (ms)
                   </th>
-                  <th className="py-2 px-4 border-b text-left">Online</th>
+                  <th className="py-2 px-4 border-b border-gray-600 text-left text-white">
+                    Online
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {history.map((check) => (
-                  <tr key={check.id} className="hover:bg-gray-50">
-                    <td className="py-2 px-4 border-b">
+                  <tr key={check.id} className="hover:bg-gray-700">
+                    <td className="py-2 px-4 border-b border-gray-600 text-gray-300">
                       {new Date(check.checkedAt).toLocaleString()}
                     </td>
-                    <td className="py-2 px-4 border-b">
+                    <td className="py-2 px-4 border-b border-gray-600 text-gray-300">
                       {check.status || "N/A"}
                     </td>
-                    <td className="py-2 px-4 border-b">
+                    <td className="py-2 px-4 border-b border-gray-600 text-gray-300">
                       {check.responseTime || "N/A"}
                     </td>
-                    <td className="py-2 px-4 border-b">
+                    <td className="py-2 px-4 border-b border-gray-600 text-gray-300">
                       {check.isOnline ? "Sim" : "Não"}
                     </td>
                   </tr>
@@ -172,7 +204,9 @@ const UrlDetailsPage: React.FC = () => {
             </table>
           </div>
         ) : (
-          <p>Nenhum histórico de verificações disponível.</p>
+          <p className="text-gray-300">
+            Nenhum histórico de verificações disponível.
+          </p>
         )}
       </div>
 
@@ -181,7 +215,9 @@ const UrlDetailsPage: React.FC = () => {
       </div>
 
       <div className="mt-8">
-        <h2 className="text-2xl font-semibold mb-4">Histórico de Incidentes</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-white">
+          Histórico de Incidentes
+        </h2>
         <IncidentHistory incidents={incidents} />
       </div>
     </div>
