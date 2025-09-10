@@ -165,43 +165,71 @@ const UrlDetailsPage: React.FC = () => {
           Histórico de Verificações
         </h2>
         {history.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-gray-800 border border-gray-600">
-              <thead>
-                <tr>
-                  <th className="py-2 px-4 border-b border-gray-600 text-left text-white">
-                    Data/Hora
-                  </th>
-                  <th className="py-2 px-4 border-b border-gray-600 text-left text-white">
-                    Status HTTP
-                  </th>
-                  <th className="py-2 px-4 border-b border-gray-600 text-left text-white">
-                    Tempo de Resposta (ms)
-                  </th>
-                  <th className="py-2 px-4 border-b border-gray-600 text-left text-white">
-                    Online
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {history.map((check) => (
-                  <tr key={check.id} className="hover:bg-gray-700">
-                    <td className="py-2 px-4 border-b border-gray-600 text-gray-300">
-                      {new Date(check.checkedAt).toLocaleString()}
-                    </td>
-                    <td className="py-2 px-4 border-b border-gray-600 text-gray-300">
-                      {check.status || "N/A"}
-                    </td>
-                    <td className="py-2 px-4 border-b border-gray-600 text-gray-300">
-                      {check.responseTime || "N/A"}
-                    </td>
-                    <td className="py-2 px-4 border-b border-gray-600 text-gray-300">
-                      {check.isOnline ? "Sim" : "Não"}
-                    </td>
+          <div className="border border-gray-600 rounded-lg overflow-hidden">
+            <div className="overflow-x-auto max-h-96 overflow-y-auto">
+              <table className="min-w-full bg-gray-800">
+                <thead className="sticky top-0 bg-gray-800 z-10">
+                  <tr>
+                    <th className="py-3 px-4 border-b border-gray-600 text-left text-white font-semibold">
+                      Data/Hora
+                    </th>
+                    <th className="py-3 px-4 border-b border-gray-600 text-left text-white font-semibold">
+                      Status HTTP
+                    </th>
+                    <th className="py-3 px-4 border-b border-gray-600 text-left text-white font-semibold">
+                      Tempo de Resposta (ms)
+                    </th>
+                    <th className="py-3 px-4 border-b border-gray-600 text-left text-white font-semibold">
+                      Online
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {history.map((check) => (
+                    <tr
+                      key={check.id}
+                      className="hover:bg-gray-700 transition-colors"
+                    >
+                      <td className="py-3 px-4 border-b border-gray-600 text-gray-300 text-sm">
+                        {new Date(check.checkedAt).toLocaleString()}
+                      </td>
+                      <td className="py-3 px-4 border-b border-gray-600 text-gray-300 text-sm">
+                        <span
+                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                            check.status &&
+                            check.status >= 200 &&
+                            check.status < 300
+                              ? "bg-green-100 text-green-800"
+                              : check.status
+                              ? "bg-red-100 text-red-800"
+                              : "bg-gray-100 text-gray-800"
+                          }`}
+                        >
+                          {check.status || "N/A"}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 border-b border-gray-600 text-gray-300 text-sm">
+                        {check.responseTime ? `${check.responseTime}ms` : "N/A"}
+                      </td>
+                      <td className="py-3 px-4 border-b border-gray-600 text-gray-300 text-sm">
+                        <span
+                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                            check.isOnline
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {check.isOnline ? "Sim" : "Não"}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="bg-gray-700 px-4 py-2 text-sm text-gray-400 border-t border-gray-600">
+              Mostrando {history.length} verificações • Role para ver mais
+            </div>
           </div>
         ) : (
           <p className="text-gray-300">
