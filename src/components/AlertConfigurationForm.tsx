@@ -14,7 +14,9 @@ interface AlertConfigurationFormProps {
   monitoredUrlId: string;
 }
 
-const AlertConfigurationForm: React.FC<AlertConfigurationFormProps> = ({ monitoredUrlId }) => {
+const AlertConfigurationForm: React.FC<AlertConfigurationFormProps> = ({
+  monitoredUrlId,
+}) => {
   const [config, setConfig] = useState<AlertConfig>({
     monitoredUrlId,
     emailRecipient: "",
@@ -31,7 +33,9 @@ const AlertConfigurationForm: React.FC<AlertConfigurationFormProps> = ({ monitor
       setLoading(true);
       setError("");
       try {
-        const response = await fetch(`/api/alert-configurations/url/${monitoredUrlId}`);
+        const response = await fetch(
+          `/api/alert-configurations/url/${monitoredUrlId}`
+        );
         if (response.status === 404) {
           // Nenhuma configuração existente
           setConfig((prev) => ({ ...prev, id: undefined }));
@@ -41,8 +45,12 @@ const AlertConfigurationForm: React.FC<AlertConfigurationFormProps> = ({ monitor
         } else {
           throw new Error("Failed to fetch alert configuration");
         }
-      } catch (err: any) {
-        setError(err.message || "Erro ao carregar configurações de alerta.");
+      } catch (err: unknown) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Erro ao carregar configurações de alerta."
+        );
       } finally {
         setLoading(false);
       }
@@ -65,7 +73,9 @@ const AlertConfigurationForm: React.FC<AlertConfigurationFormProps> = ({ monitor
     setSuccess("");
 
     const method = config.id ? "PUT" : "POST";
-    const url = config.id ? `/api/alert-configurations/${config.id}` : "/api/alert-configurations";
+    const url = config.id
+      ? `/api/alert-configurations/${config.id}`
+      : "/api/alert-configurations";
 
     try {
       const response = await fetch(url, {
@@ -76,14 +86,18 @@ const AlertConfigurationForm: React.FC<AlertConfigurationFormProps> = ({ monitor
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Falha ao salvar configuração de alerta.");
+        throw new Error(
+          errorData.message || "Falha ao salvar configuração de alerta."
+        );
       }
 
       const savedConfig: AlertConfig = await response.json();
       setConfig(savedConfig); // Atualiza o ID se for uma nova criação
       setSuccess("Configuração de alerta salva com sucesso!");
-    } catch (err: any) {
-      setError(err.message || "Ocorreu um erro ao salvar.");
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error ? err.message : "Ocorreu um erro ao salvar."
+      );
     } finally {
       setLoading(false);
     }
@@ -92,34 +106,42 @@ const AlertConfigurationForm: React.FC<AlertConfigurationFormProps> = ({ monitor
   if (loading) return <p>Carregando configurações de alerta...</p>;
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-semibold mb-4">Configurações de Alerta</h2>
+    <div className="bg-gray-700 p-6 rounded-lg shadow-md">
+      <h2 className="text-xl font-semibold mb-4 text-white">
+        Configurações de Alerta
+      </h2>
       {error && <p className="text-red-500 mb-4">{error}</p>}
       {success && <p className="text-green-500 mb-4">{success}</p>}
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label htmlFor="emailRecipient" className="block text-gray-700 text-sm font-bold mb-2">
+          <label
+            htmlFor="emailRecipient"
+            className="block text-white text-sm font-bold mb-2"
+          >
             E-mail para Notificação:
           </label>
           <input
             type="email"
             id="emailRecipient"
             name="emailRecipient"
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-white bg-gray-800 border-gray-600 placeholder-gray-400 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500"
             value={config.emailRecipient || ""}
             onChange={handleChange}
             placeholder="seu.email@exemplo.com"
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="webhookUrl" className="block text-gray-700 text-sm font-bold mb-2">
+          <label
+            htmlFor="webhookUrl"
+            className="block text-white text-sm font-bold mb-2"
+          >
             Webhook URL:
           </label>
           <input
             type="url"
             id="webhookUrl"
             name="webhookUrl"
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-white bg-gray-800 border-gray-600 placeholder-gray-400 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500"
             value={config.webhookUrl || ""}
             onChange={handleChange}
             placeholder="https://api.example.com/webhook"
@@ -134,7 +156,7 @@ const AlertConfigurationForm: React.FC<AlertConfigurationFormProps> = ({ monitor
             checked={config.notifyOnDown}
             onChange={handleChange}
           />
-          <label htmlFor="notifyOnDown" className="text-sm text-gray-700">
+          <label htmlFor="notifyOnDown" className="text-sm text-white">
             Notificar quando a URL ficar OFFLINE
           </label>
         </div>
@@ -147,7 +169,7 @@ const AlertConfigurationForm: React.FC<AlertConfigurationFormProps> = ({ monitor
             checked={config.notifyOnUp}
             onChange={handleChange}
           />
-          <label htmlFor="notifyOnUp" className="text-sm text-gray-700">
+          <label htmlFor="notifyOnUp" className="text-sm text-white">
             Notificar quando a URL voltar ONLINE
           </label>
         </div>
