@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import type { AddUrlFormData } from "../types";
 import { DEFAULT_VALUES } from "../constants";
 import { isValidUrl } from "../utils";
+import { getApiUrl } from "../config/api";
 
 interface AddUrlFormProps {
   onUrlAdded: () => void; // Callback para quando uma URL for adicionada com sucesso
@@ -60,7 +61,7 @@ const AddUrlForm: React.FC<AddUrlFormProps> = ({ onUrlAdded }) => {
     }
 
     try {
-      const response = await fetch("/api/monitored-urls", {
+      const response = await fetch(getApiUrl("/api/monitored-urls"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
