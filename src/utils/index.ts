@@ -73,7 +73,7 @@ export const generateId = (): string => {
 /**
  * Debounce function para otimizar performance
  */
-export const debounce = <T extends (...args: any[]) => any>(
+export const debounce = <T extends (...args: never[]) => unknown>(
   func: T,
   wait: number
 ): ((...args: Parameters<T>) => void) => {
