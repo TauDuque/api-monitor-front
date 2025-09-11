@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/pages/SettingsPage.tsx
 import React, { useState, useEffect, useCallback } from "react";
 import AddUrlForm from "../components/AddUrlForm";
