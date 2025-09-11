@@ -1,13 +1,6 @@
 // src/components/IncidentHistory.tsx
 import React from "react";
-
-interface Incident {
-  id: string;
-  type: string;
-  description: string;
-  startedAt: string;
-  resolvedAt: string | null;
-}
+import type { Incident } from "../types";
 
 interface IncidentHistoryProps {
   incidents: Incident[];
@@ -15,7 +8,11 @@ interface IncidentHistoryProps {
 
 const IncidentHistory: React.FC<IncidentHistoryProps> = ({ incidents }) => {
   if (incidents.length === 0) {
-    return <p className="text-gray-600">Nenhum incidente registrado para esta URL.</p>;
+    return (
+      <p className="text-gray-600">
+        Nenhum incidente registrado para esta URL.
+      </p>
+    );
   }
 
   return (
@@ -36,20 +33,30 @@ const IncidentHistory: React.FC<IncidentHistoryProps> = ({ incidents }) => {
               <td className="py-2 px-4 border-b">
                 <span
                   className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    incident.type === "DOWN" ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"
+                    incident.type === "DOWN"
+                      ? "bg-red-100 text-red-800"
+                      : "bg-green-100 text-green-800"
                   }`}
                 >
                   {incident.type}
                 </span>
               </td>
               <td className="py-2 px-4 border-b">{incident.description}</td>
-              <td className="py-2 px-4 border-b">{new Date(incident.startedAt).toLocaleString()}</td>
               <td className="py-2 px-4 border-b">
-                {incident.resolvedAt ? new Date(incident.resolvedAt).toLocaleString() : "Em aberto"}
+                {new Date(incident.startedAt).toLocaleString()}
               </td>
               <td className="py-2 px-4 border-b">
                 {incident.resolvedAt
-                  ? ((new Date(incident.resolvedAt).getTime() - new Date(incident.startedAt).getTime()) / (1000 * 60)).toFixed(2) + " min"
+                  ? new Date(incident.resolvedAt).toLocaleString()
+                  : "Em aberto"}
+              </td>
+              <td className="py-2 px-4 border-b">
+                {incident.resolvedAt
+                  ? (
+                      (new Date(incident.resolvedAt).getTime() -
+                        new Date(incident.startedAt).getTime()) /
+                      (1000 * 60)
+                    ).toFixed(2) + " min"
                   : "N/A"}
               </td>
             </tr>

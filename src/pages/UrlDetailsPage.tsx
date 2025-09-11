@@ -5,38 +5,8 @@ import UptimeChart from "../components/UptimeChart";
 import StatusTimeline from "../components/StatusTimeline";
 import AlertConfigurationForm from "../components/AlertConfigurationForm";
 import IncidentHistory from "../components/IncidentHistory";
-
-interface MonitoredURL {
-  id: string;
-  url: string;
-  name: string;
-  interval: number;
-  active: boolean;
-}
-
-interface URLCheck {
-  id: string;
-  monitoredUrlId: string;
-  status: number | null;
-  responseTime: number | null;
-  isOnline: boolean;
-  checkedAt: string;
-}
-
-interface UptimeMetric {
-  period_start: string;
-  total_checks: number;
-  online_checks: number;
-  uptime_percentage: number;
-}
-
-interface Incident {
-  id: string;
-  type: string;
-  description: string;
-  startedAt: string;
-  resolvedAt: string | null;
-}
+import apiService from "../services/apiService";
+import type { MonitoredURL, URLCheck, UptimeMetric, Incident } from "../types";
 
 const UrlDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -49,13 +19,13 @@ const UrlDetailsPage: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!id) return;
+
       setLoading(true);
       setError("");
       try {
         // Fetch URL details
-        const urlRes = await fetch(`/api/monitored-urls/${id}`);
-        if (!urlRes.ok) throw new Error("Failed to fetch URL details");
-        const urlData: MonitoredURL = await urlRes.json();
+        const urlData: MonitoredURL = await apiService.getMonitoredUrl(id);
         setUrlDetails(urlData);
 
         // Fetch history (e.g., last 24 hours)
@@ -63,11 +33,11 @@ const UrlDetailsPage: React.FC = () => {
         const twentyFourHoursAgo = new Date(
           now.getTime() - 24 * 60 * 60 * 1000
         );
-        const historyRes = await fetch(
-          `/api/checks/${id}/history?startDate=${twentyFourHoursAgo.toISOString()}&endDate=${now.toISOString()}&take=200`
-        ); // Limitar para timeline
-        if (!historyRes.ok) throw new Error("Failed to fetch history");
-        const historyData: URLCheck[] = await historyRes.json();
+        const historyData: URLCheck[] = await apiService.getUrlHistory(id, {
+          startDate: twentyFourHoursAgo.toISOString(),
+          endDate: now.toISOString(),
+          take: 200,
+        });
         setHistory(historyData);
 
         // Fetch uptime metrics (e.g., daily for last 30 days)
@@ -75,16 +45,15 @@ const UrlDetailsPage: React.FC = () => {
           now.getTime() - 30 * 24 * 60 * 60 * 1000
         );
         try {
-          const uptimeRes = await fetch(
-            `/api/checks/${id}/uptime?period=day&startDate=${thirtyDaysAgo.toISOString()}&endDate=${now.toISOString()}`
+          const uptimeJson: UptimeMetric[] = await apiService.getUptimeMetrics(
+            id,
+            {
+              period: "day",
+              startDate: thirtyDaysAgo.toISOString(),
+              endDate: now.toISOString(),
+            }
           );
-          if (uptimeRes.ok) {
-            const uptimeJson: UptimeMetric[] = await uptimeRes.json();
-            setUptimeData(uptimeJson);
-          } else {
-            console.warn("Failed to fetch uptime data, continuing without it");
-            setUptimeData([]);
-          }
+          setUptimeData(uptimeJson);
         } catch (uptimeError) {
           console.warn("Error fetching uptime data:", uptimeError);
           setUptimeData([]);
@@ -92,14 +61,8 @@ const UrlDetailsPage: React.FC = () => {
 
         // Fetch incidents
         try {
-          const incidentsRes = await fetch(`/api/checks/${id}/incidents`);
-          if (incidentsRes.ok) {
-            const incidentsData: Incident[] = await incidentsRes.json();
-            setIncidents(incidentsData);
-          } else {
-            console.warn("Failed to fetch incidents, continuing without them");
-            setIncidents([]);
-          }
+          const incidentsData: Incident[] = await apiService.getIncidents(id);
+          setIncidents(incidentsData);
         } catch (incidentsError) {
           console.warn("Error fetching incidents:", incidentsError);
           setIncidents([]);
