@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { getSocket } from "../services/socketService"; // Importe o serviço de socket
+import apiService from "../services/apiService";
 
 interface MonitoredURL {
   id: string;
@@ -34,31 +35,22 @@ const DashboardPage: React.FC = () => {
     setLoading(true);
     setError("");
     try {
-      const response = await fetch("/api/monitored-urls");
-      if (!response.ok) {
-        throw new Error("Failed to fetch URLs");
-      }
-      const data: MonitoredURL[] = await response.json();
+      const data: MonitoredURL[] = await apiService.getMonitoredUrls();
 
       // Para cada URL, tente buscar o último status (se houver)
       const urlsWithStatus = await Promise.all(
         data.map(async (url) => {
           try {
-            const checkRes = await fetch(
-              `/api/checks/${url.id}/history?take=1`
-            );
-            if (checkRes.ok) {
-              const checks = await checkRes.json();
-              if (checks.length > 0) {
-                const lastCheck = checks[0];
-                return {
-                  ...url,
-                  lastCheckStatus: lastCheck.status,
-                  lastCheckResponseTime: lastCheck.responseTime,
-                  lastCheckIsOnline: lastCheck.isOnline,
-                  lastCheckedAt: lastCheck.checkedAt,
-                };
-              }
+            const checks = await apiService.getUrlHistory(url.id, { take: 1 });
+            if (checks.length > 0) {
+              const lastCheck = checks[0];
+              return {
+                ...url,
+                lastCheckStatus: lastCheck.status,
+                lastCheckResponseTime: lastCheck.responseTime,
+                lastCheckIsOnline: lastCheck.isOnline,
+                lastCheckedAt: lastCheck.checkedAt,
+              };
             }
           } catch (e) {
             console.error(`Error fetching last check for ${url.name}:`, e);

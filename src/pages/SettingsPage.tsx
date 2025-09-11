@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import AddUrlForm from "../components/AddUrlForm";
 import UrlListItem from "../components/UrlListItem";
+import apiService from "../services/apiService";
 
 interface MonitoredURL {
   id: string;
@@ -20,11 +21,7 @@ const SettingsPage: React.FC = () => {
     setLoading(true);
     setError("");
     try {
-      const response = await fetch("/api/monitored-urls");
-      if (!response.ok) {
-        throw new Error("Failed to fetch URLs");
-      }
-      const data: MonitoredURL[] = await response.json();
+      const data: MonitoredURL[] = await apiService.getMonitoredUrls();
       setUrls(data);
     } catch (err: any) {
       setError(err.message || "Ocorreu um erro ao carregar URLs.");
@@ -42,12 +39,7 @@ const SettingsPage: React.FC = () => {
       return;
     }
     try {
-      const response = await fetch(`/api/monitored-urls/${id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) {
-        throw new Error("Failed to delete URL");
-      }
+      await apiService.deleteMonitoredUrl(id);
       fetchUrls(); // Recarrega a lista após a exclusão
     } catch (err: any) {
       setError(err.message || "Ocorreu um erro ao excluir URL.");
