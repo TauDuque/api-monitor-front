@@ -2,6 +2,8 @@
 // src/services/apiService.ts
 // Serviço centralizado para requisições da API
 
+import type { MonitoredURL, URLCheck, Incident, AlertConfig } from "../types";
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 class ApiService {
@@ -36,83 +38,85 @@ class ApiService {
   }
 
   // Monitored URLs
-  async getMonitoredUrls() {
-    return this.request("/api/monitored-urls");
+  async getMonitoredUrls(): Promise<MonitoredURL[]> {
+    return this.request<MonitoredURL[]>("/api/monitored-urls");
   }
 
-  async getMonitoredUrl(id: string) {
-    return this.request(`/api/monitored-urls/${id}`);
+  async getMonitoredUrl(id: string): Promise<MonitoredURL> {
+    return this.request<MonitoredURL>(`/api/monitored-urls/${id}`);
   }
 
-  async createMonitoredUrl(data: any) {
-    return this.request("/api/monitored-urls", {
+  async createMonitoredUrl(data: any): Promise<MonitoredURL> {
+    return this.request<MonitoredURL>("/api/monitored-urls", {
       method: "POST",
       body: JSON.stringify(data),
     });
   }
 
-  async updateMonitoredUrl(id: string, data: any) {
-    return this.request(`/api/monitored-urls/${id}`, {
+  async updateMonitoredUrl(id: string, data: any): Promise<MonitoredURL> {
+    return this.request<MonitoredURL>(`/api/monitored-urls/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
     });
   }
 
-  async deleteMonitoredUrl(id: string) {
-    return this.request(`/api/monitored-urls/${id}`, {
+  async deleteMonitoredUrl(id: string): Promise<void> {
+    return this.request<void>(`/api/monitored-urls/${id}`, {
       method: "DELETE",
     });
   }
 
   // URL Checks
-  async getUrlHistory(id: string, params?: any) {
+  async getUrlHistory(id: string, params?: any): Promise<URLCheck[]> {
     const queryString = params
       ? "?" + new URLSearchParams(params).toString()
       : "";
-    return this.request(`/api/checks/${id}/history${queryString}`);
+    return this.request<URLCheck[]>(`/api/checks/${id}/history${queryString}`);
   }
 
-  async getLatestChecks() {
-    return this.request("/api/checks/latest");
+  async getLatestChecks(): Promise<URLCheck[]> {
+    return this.request<URLCheck[]>("/api/checks/latest");
   }
 
-  async getUptimeMetrics(id: string, params: any) {
+  async getUptimeMetrics(id: string, params: any): Promise<any> {
     const queryString = "?" + new URLSearchParams(params).toString();
-    return this.request(`/api/checks/${id}/uptime${queryString}`);
+    return this.request<any>(`/api/checks/${id}/uptime${queryString}`);
   }
 
-  async getIncidents(id?: string) {
+  async getIncidents(id?: string): Promise<Incident[]> {
     const endpoint = id
       ? `/api/checks/${id}/incidents`
       : "/api/checks/incidents";
-    return this.request(endpoint);
+    return this.request<Incident[]>(endpoint);
   }
 
   // Alert Configurations
-  async getAlertConfigurations() {
-    return this.request("/api/alert-configurations");
+  async getAlertConfigs(): Promise<AlertConfig[]> {
+    return this.request<AlertConfig[]>("/api/alert-configurations");
   }
 
-  async getAlertConfigurationByUrl(urlId: string) {
-    return this.request(`/api/alert-configurations/url/${urlId}`);
+  async getAlertConfigByUrl(urlId: string): Promise<AlertConfig | null> {
+    return this.request<AlertConfig | null>(
+      `/api/alert-configurations/url/${urlId}`
+    );
   }
 
-  async createAlertConfiguration(data: any) {
-    return this.request("/api/alert-configurations", {
+  async createAlertConfig(data: any): Promise<AlertConfig> {
+    return this.request<AlertConfig>("/api/alert-configurations", {
       method: "POST",
       body: JSON.stringify(data),
     });
   }
 
-  async updateAlertConfiguration(id: string, data: any) {
-    return this.request(`/api/alert-configurations/${id}`, {
+  async updateAlertConfig(id: string, data: any): Promise<AlertConfig> {
+    return this.request<AlertConfig>(`/api/alert-configurations/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
     });
   }
 
-  async deleteAlertConfiguration(id: string) {
-    return this.request(`/api/alert-configurations/${id}`, {
+  async deleteAlertConfig(id: string): Promise<void> {
+    return this.request<void>(`/api/alert-configurations/${id}`, {
       method: "DELETE",
     });
   }
