@@ -8,7 +8,15 @@ let socket: Socket | null = null;
 
 export const getSocket = (): Socket => {
   if (!socket) {
-    socket = io(SOCKET_SERVER_URL);
+    socket = io(SOCKET_SERVER_URL, {
+      path: "/socket.io/",
+      transports: ["websocket", "polling"],
+      reconnectionDelay: 1000,
+      reconnection: true,
+      reconnectionAttempts: 10,
+      forceNew: true,
+      timeout: 20000,
+    });
 
     socket.on("connect", () => {
       console.log("Connected to Socket.io server");
