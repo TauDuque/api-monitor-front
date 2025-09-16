@@ -15,7 +15,9 @@ export const getSocket = (): Socket => {
       reconnection: true,
       reconnectionAttempts: 10,
       forceNew: true,
-      timeout: 20000,
+      timeout: 60000, // Aumentado para 60 segundos
+      upgrade: true,
+      rememberUpgrade: true,
     });
 
     socket.on("connect", () => {
