@@ -34,6 +34,12 @@ class ApiService {
       throw new Error(`API Error: ${response.status} - ${errorText}`);
     }
 
+    // Para respostas vazias (como 204 No Content em DELETE), retorna void
+    const contentLength = response.headers.get("content-length");
+    if (contentLength === "0" || response.status === 204) {
+      return undefined as T;
+    }
+
     return response.json();
   }
 

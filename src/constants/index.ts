@@ -1,10 +1,18 @@
 // src/constants/index.ts
 // Constantes da aplicação
 
+import { getApiUrl } from "../config/api";
+
 export const API_ENDPOINTS = {
-  MONITORED_URLS: "/api/monitored-urls",
-  CHECKS: "/api/checks",
-  ALERT_CONFIGS: "/api/alert-configurations",
+  get MONITORED_URLS() {
+    return getApiUrl("/api/monitored-urls");
+  },
+  get CHECKS() {
+    return getApiUrl("/api/checks");
+  },
+  get ALERT_CONFIGS() {
+    return getApiUrl("/api/alert-configurations");
+  },
 } as const;
 
 export const ROUTES = {
