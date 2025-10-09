@@ -1,5 +1,6 @@
 // src/components/AlertConfigurationForm.tsx
 import React, { useState, useEffect } from "react";
+import { getApiUrl } from "../config/api";
 
 interface AlertConfig {
   id?: string; // Pode ser nulo se for uma nova configuração
@@ -17,6 +18,15 @@ interface AlertConfigurationFormProps {
 const AlertConfigurationForm: React.FC<AlertConfigurationFormProps> = ({
   monitoredUrlId,
 }) => {
+  // Debug para verificar configuração da API
+  React.useEffect(() => {
+    console.log(
+      "AlertConfigurationForm - API URL sendo usada:",
+      getApiUrl("/api/alert-configurations")
+    );
+    console.log("monitoredUrlId:", monitoredUrlId);
+  }, [monitoredUrlId]);
+
   const [config, setConfig] = useState<AlertConfig>({
     monitoredUrlId,
     emailRecipient: "",
@@ -34,7 +44,7 @@ const AlertConfigurationForm: React.FC<AlertConfigurationFormProps> = ({
       setError("");
       try {
         const response = await fetch(
-          `/api/alert-configurations/url/${monitoredUrlId}`
+          getApiUrl(`/api/alert-configurations/url/${monitoredUrlId}`)
         );
         if (response.status === 404) {
           // Nenhuma configuração existente
@@ -74,8 +84,8 @@ const AlertConfigurationForm: React.FC<AlertConfigurationFormProps> = ({
 
     const method = config.id ? "PUT" : "POST";
     const url = config.id
-      ? `/api/alert-configurations/${config.id}`
-      : "/api/alert-configurations";
+      ? getApiUrl(`/api/alert-configurations/${config.id}`)
+      : getApiUrl("/api/alert-configurations");
 
     try {
       const response = await fetch(url, {
