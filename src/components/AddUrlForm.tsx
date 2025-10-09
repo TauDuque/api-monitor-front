@@ -3,19 +3,13 @@ import React, { useState } from "react";
 import type { AddUrlFormData } from "../types";
 import { DEFAULT_VALUES } from "../constants";
 import { isValidUrl } from "../utils";
-import { getApiUrl, debugApiConfig } from "../config/api";
+import { getApiUrl } from "../config/api";
 
 interface AddUrlFormProps {
   onUrlAdded: () => void; // Callback para quando uma URL for adicionada com sucesso
 }
 
 const AddUrlForm: React.FC<AddUrlFormProps> = ({ onUrlAdded }) => {
-  // Debug para verificar configuração da API
-  React.useEffect(() => {
-    debugApiConfig();
-    console.log("API URL sendo usada:", getApiUrl("/api/monitored-urls"));
-  }, []);
-
   const [formData, setFormData] = useState<AddUrlFormData>({
     name: "",
     url: "",

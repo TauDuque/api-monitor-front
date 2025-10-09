@@ -18,15 +18,6 @@ interface AlertConfigurationFormProps {
 const AlertConfigurationForm: React.FC<AlertConfigurationFormProps> = ({
   monitoredUrlId,
 }) => {
-  // Debug para verificar configuração da API
-  React.useEffect(() => {
-    console.log(
-      "AlertConfigurationForm - API URL sendo usada:",
-      getApiUrl("/api/alert-configurations")
-    );
-    console.log("monitoredUrlId:", monitoredUrlId);
-  }, [monitoredUrlId]);
-
   const [config, setConfig] = useState<AlertConfig>({
     monitoredUrlId,
     emailRecipient: "",
